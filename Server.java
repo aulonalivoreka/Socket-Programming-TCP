@@ -27,5 +27,18 @@ public class Server
                     new BufferedInputStream(socket.getInputStream()));
 
             String line = "";
+              while (!line.equals("Over"))
+            {
+                try
+                {
+                    line = in.readUTF();
+                    System.out.println(line);
+
+                }
+                 catch(IOException i)
+                {
+                    System.out.println(i);
+                }
+            }
 
             
