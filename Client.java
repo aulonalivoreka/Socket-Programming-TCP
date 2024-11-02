@@ -23,5 +23,17 @@ public class Client {
             System.out.println(i);
             return;
         }
+
+        String line = "";
+        while (!line.equals("Over")) {
+            try {
+                line = input.readLine();
+                out.writeUTF(line);
+            }
+            catch (IOException i) {
+                System.out.println(i);
+            }
+        }
+
     }
 }
