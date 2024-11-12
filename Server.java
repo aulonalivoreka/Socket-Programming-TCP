@@ -40,3 +40,37 @@
             sendEncryptedMessage("Limited access granted. You can view files only.");
             listFilesInFolder();
         }
+ private void provideLimitedAccess() throws Exception {
+            sendEncryptedMessage("Limited access granted. You can view files only.");
+            listFilesInFolder();
+        }
+
+        private void listFilesInFolder() throws Exception {
+            String folderPath = "./server_data";
+            try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(folderPath))) {
+                sendEncryptedMessage("Files in " + folderPath + ":");
+                for (Path filePath : directoryStream) {
+                    sendEncryptedMessage(filePath.getFileName().toString());
+                }
+            } catch (IOException e) {
+                sendEncryptedMessage("Error accessing folder.");
+                e.printStackTrace();
+            }
+        }
+
+        private void sendEncryptedMessage(String message) throws Exception {
+            out.println(AESUtil.encrypt(message, secretKey));
+        }
+
+        private void closeResources() {
+            try {
+                if (in != null) in.close();
+                if (out != null) out.close();
+                if (clientSocket != null) clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
