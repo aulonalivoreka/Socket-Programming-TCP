@@ -17,6 +17,36 @@ public class Server {
             return;
         }
 
+                // Initialize AES key
+        byte[] decodedKey = Base64.getDecoder().decode(SECRET_KEY_STRING);
+        secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+
+        // Parse IP address and port
+        String ipAddress = args[0];
+        int port = Integer.parseInt(args[1]);
+
+        try (ServerSocket serverSocket = new ServerSocket(port, 50, InetAddress.getByName(ipAddress))) {
+            System.out.println("Server is listening on " + ipAddress + ":" + port);
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                System.out.println("Connected to client: " + clientSocket.getInetAddress());
+                new Thread(new ClientHandler(clientSocket)).start();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static class ClientHandler implements Runnable {
+        private Socket clientSocket;
+        private BufferedReader in;
+        private PrintWriter out;
+        private boolean isAuthorized = false;
+
+        public ClientHandler(Socket socket) {
+            this.clientSocket = socket;
+        }
+
 public void run() {
             try {
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
