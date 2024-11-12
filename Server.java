@@ -1,4 +1,23 @@
- public void run() {
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.*;
+import java.net.*;
+import java.nio.file.*;
+import java.util.Base64;
+
+public class Server {
+    private static final String ACCESS_KEY = "FULL_ACCESS_KEY"; // Full access key
+    private static boolean isFullAccessGranted = false; // Track full access status
+    private static final String SECRET_KEY_STRING = "YOUR_BASE64_SECRET_KEY"; // Base64 encoded AES key
+    private static SecretKey secretKey;
+
+    public static void main(String[] args) {
+        if (args.length != 2) {
+            System.out.println("Usage: java Server <IP Address> <Port>");
+            return;
+        }
+
+public void run() {
             try {
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
