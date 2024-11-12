@@ -23,3 +23,20 @@
                 closeResources();
             }
         }
+ private void handleFullAccessRequest(String decryptedMessage) throws Exception {
+            String providedKey = decryptedMessage.split(" ")[1];
+            if (providedKey.equals(ACCESS_KEY) && !isFullAccessGranted) {
+                isAuthorized = true;
+                isFullAccessGranted = true;
+                sendEncryptedMessage("Full access granted. You can list, create, and delete files.");
+            } else if (isFullAccessGranted) {
+                sendEncryptedMessage("Full access already granted to another client.");
+            } else {
+                sendEncryptedMessage("Incorrect access key.");
+            }
+        }
+
+        private void provideLimitedAccess() throws Exception {
+            sendEncryptedMessage("Limited access granted. You can view files only.");
+            listFilesInFolder();
+        }
