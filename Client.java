@@ -58,6 +58,16 @@ public class Client {
             }
         }).start();
     }
+
+     public void sendMessage() {
+        System.out.print("Enter message: ");
+        try {
+            String message = userInput.readLine();
+            sendEncryptedMessage(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
        
 }
 
