@@ -110,6 +110,11 @@ public class Client {
         byte[] decodedBytes = Base64.getDecoder().decode(encryptedMessage);
         return new String(cipher.doFinal(decodedBytes), "UTF-8");
     }
+    private static void sendMessage(String message) throws Exception {
+        String encryptedMessage = encrypt(message, aesKey);
+        output.writeUTF(encryptedMessage);
+    }
+
 
 
 }
