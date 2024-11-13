@@ -33,6 +33,18 @@ public class Client {
             e.printStackTrace();
         }
     }
+    private void requestFullAccess() {
+        System.out.print("Enter full access key: ");
+        try {
+            String accessKey = userInput.readLine();
+            sendEncryptedMessage("FULL_ACCESS " + accessKey);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void requestReadAccess() {
+        sendEncryptedMessage("REQUEST_ACCESS");
+    }
         String line = "";
         while (!line.equals("Over")) {
             try {
