@@ -42,7 +42,7 @@ public class Client {
             output.writeUTF(encryptedName);
 
 
-            // Main interaction loop with the server
+
             while (true) {
                 System.out.print("Enter command (list_files, read_file [filename], write_file [filename], execute [filename], exit): ");
                 String command = scanner.nextLine();
@@ -61,7 +61,7 @@ public class Client {
                 } else if (command.startsWith("write_file")) {
                     if (hasFullPermissions) {
                         sendMessage(command);
-                        // Wait for server to prompt for content
+
                         String prompt = receiveMessage();
                         System.out.println(prompt);
                         String content = scanner.nextLine();
@@ -72,7 +72,7 @@ public class Client {
                         System.out.println("Error: You do not have permission to write to the folder.");
                     }
                 } else if (command.startsWith("execute ")) {
-                    // Execute command for specific file
+
                     sendMessage(command);
                     String response = receiveMessage();
                     System.out.println("Server Response:\n" + response);
@@ -80,7 +80,7 @@ public class Client {
                     System.out.println("Unknown command.");
                 }
             }
-            // Close connections
+
             input.close();
             output.close();
             socket.close();
