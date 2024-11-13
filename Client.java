@@ -58,6 +58,17 @@ public class Client {
                     sendMessage(command);
                     String response = receiveMessage();
                     System.out.println("Server Response:\n" + response);
+                } else if (command.startsWith("write_file")) {
+                    if (hasFullPermissions) {
+                        sendMessage(command);
+                        // Wait for server to prompt for content
+                        String prompt = receiveMessage();
+                        System.out.println(prompt);
+                        String content = scanner.nextLine();
+                        sendMessage(content);
+                        String response = receiveMessage();
+                        System.out.println("Server Response: " + response);
+                    }
 
         }
 
