@@ -114,6 +114,11 @@ public class Client {
         String encryptedMessage = encrypt(message, aesKey);
         output.writeUTF(encryptedMessage);
     }
+    private static String receiveMessage() throws Exception {
+        String encryptedMessage = input.readUTF();
+        return decrypt(encryptedMessage, aesKey);
+    }
+
 
 
 
