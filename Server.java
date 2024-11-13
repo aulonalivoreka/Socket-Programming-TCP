@@ -166,3 +166,41 @@ private void readFile(String filename) throws Exception {
         sendMessage("File not found: " + filename);
     }
 }
+    // Method to write to a file in the shared folder (only for clients with full permissions)
+private void writeFile(String filename) throws Exception {
+    File file = new File(folderPath + "/" + filename);
+    if (file.exists() && file.isFile()) {
+        sendMessage("Enter content to write to " + filename + ":");
+        String encryptedContent = input.readUTF();
+        String content = decrypt(encryptedContent, aesKey);
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+        writer.write(content);
+        writer.newLine();
+        writer.close();
+        sendMessage("Content written to " + filename);
+    } else {
+        sendMessage("File not found: " + filename);
+    }
+}
+
+// Method to execute a file in the shared folder (only for clients with full permissions)
+private void executeFile(String filename) throws Exception {
+    File file = new File(folderPath + "/" + filename);
+    if (file.exists() && file.canExecute()) {
+        // Choose the command based on file type
+        String[] command;
+        if (filename.endsWith(".sh")) {
+            command = new String[] { "bash", file.getAbsolutePath() };
+        } else if (filename.endsWith(".bat")) {
+            command = new String[] { "cmd.exe", "/c", file.getAbsolutePath() };
+        } else if (filename.endsWith(".py")) {
+            command = new String[] { "python", file.getAbsolutePath() };
+        } else if (filename.endsWith(".js")) {
+            command = new String[] { "node", file.getAbsolutePath() };
+        } else if (filename.endsWith(".exe")) {
+            command = new String[] { file.getAbsolutePath() };
+        } else {
+            sendMessage("Unsupported file type for execution: " + filename);
+            return;
+        }
