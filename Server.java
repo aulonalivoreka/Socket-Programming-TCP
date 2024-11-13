@@ -130,11 +130,4 @@ class ClientHandler implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public ClientHandler(Socket socket, Key aesKey, String folderPath, boolean hasFullPermissions) {
-        this.clientSocket = socket;
-        this.aesKey = aesKey;
-        this.folderPath = folderPath;
-        this.hasFullPermissions = hasFullPermissions;
-    }
+    }    
