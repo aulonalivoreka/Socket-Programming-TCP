@@ -1,3 +1,4 @@
+import javax.crypto.spec.SecretKeySpec;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
@@ -90,12 +91,15 @@ public class Client {
             e.printStackTrace();
         }
     }
+    private static Key generateAESKey() {
 
-
-
-}
-
-
-
+        byte[] key = "1234567890123456".getBytes(); // Simple 16-byte key for testing
+        return new SecretKeySpec(key, "AES");
     }
+
 }
+
+
+
+
+
