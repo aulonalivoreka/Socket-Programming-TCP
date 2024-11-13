@@ -68,6 +68,13 @@ public class Client {
             e.printStackTrace();
         }
     }
+     private void sendEncryptedMessage(String message) {
+        try {
+            out.println(AESUtil.encrypt(message, secretKey));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
        
 }
 
