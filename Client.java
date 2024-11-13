@@ -80,9 +80,20 @@ public class Client {
                     System.out.println("Unknown command.");
                 }
             }
+            // Close connections
+            input.close();
+            output.close();
+            socket.close();
+            System.out.println("Disconnected from server.");
 
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+
+
+}
 
 
 
