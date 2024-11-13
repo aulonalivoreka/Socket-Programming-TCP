@@ -25,9 +25,15 @@ public class Client {
             Socket socket = new Socket(serverIp, port);
             System.out.println("Connected to server.");
 
-      
+
             input = new DataInputStream(socket.getInputStream());
             output = new DataOutputStream(socket.getOutputStream());
+
+
+            aesKey = generateAESKey();
+            
+            hasFullPermissions = input.readBoolean();
+            System.out.println("Full permissions: " + hasFullPermissions);
 
         }
 
