@@ -204,3 +204,20 @@ private void executeFile(String filename) throws Exception {
             sendMessage("Unsupported file type for execution: " + filename);
             return;
         }
+// Execute the file
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+        Process process = processBuilder.start();
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        StringBuilder output = new StringBuilder("Execution result of " + filename + ":\n");
+        String line;
+        while ((line = reader.readLine()) != null) {
+            output.append(line).append("\n");
+        }
+        reader.close();
+        sendMessage(output.toString());
+
+    } else {
+        sendMessage("File is not executable or does not exist: " + filename);
+    }
+}
