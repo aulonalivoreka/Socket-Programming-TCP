@@ -221,3 +221,19 @@ private void executeFile(String filename) throws Exception {
         sendMessage("File is not executable or does not exist: " + filename);
     }
 }
+    // Encryption method
+private String encrypt(String message, Key key) throws Exception {
+    Cipher cipher = Cipher.getInstance("AES");
+    cipher.init(Cipher.ENCRYPT_MODE, key);
+    byte[] encryptedBytes = cipher.doFinal(message.getBytes("UTF-8"));
+    return Base64.getEncoder().encodeToString(encryptedBytes);
+}
+
+// Decryption method
+private String decrypt(String encryptedMessage, Key key) throws Exception {
+    Cipher cipher = Cipher.getInstance("AES");
+    cipher.init(Cipher.DECRYPT_MODE, key);
+    byte[] decodedBytes = Base64.getDecoder().decode(encryptedMessage);
+    return new String(cipher.doFinal(decodedBytes), "UTF-8");
+}
+}
