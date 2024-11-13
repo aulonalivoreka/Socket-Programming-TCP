@@ -56,3 +56,29 @@ public class Server {
             e.printStackTrace();
         }
     }
+
+        // Generate AES key for encryption
+    private static Key generateAESKey() {
+        // Fixed 16-byte (128-bit) key for testing purposes
+        byte[] key = "1234567890123456".getBytes(); // Simple 16-byte key
+        return new SecretKeySpec(key, "AES");
+    }
+
+}
+
+class ClientHandler implements Runnable {
+
+    private Socket clientSocket;
+    private Key aesKey;
+    private String folderPath;
+    private DataInputStream input;
+    private DataOutputStream output;
+    private boolean hasFullPermissions; // true if client has full access
+    private String clientName;
+
+    public ClientHandler(Socket socket, Key aesKey, String folderPath, boolean hasFullPermissions) {
+        this.clientSocket = socket;
+        this.aesKey = aesKey;
+        this.folderPath = folderPath;
+        this.hasFullPermissions = hasFullPermissions;
+    }
