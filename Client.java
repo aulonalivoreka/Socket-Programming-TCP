@@ -31,9 +31,15 @@ public class Client {
 
 
             aesKey = generateAESKey();
-            
+
             hasFullPermissions = input.readBoolean();
             System.out.println("Full permissions: " + hasFullPermissions);
+
+            
+            System.out.print("Enter your name: ");
+            clientName = scanner.nextLine();
+            String encryptedName = encrypt(clientName, aesKey);
+            output.writeUTF(encryptedName);
 
         }
 
