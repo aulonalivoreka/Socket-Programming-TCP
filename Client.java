@@ -68,7 +68,19 @@ public class Client {
                         sendMessage(content);
                         String response = receiveMessage();
                         System.out.println("Server Response: " + response);
+                    } else {
+                        System.out.println("Error: You do not have permission to write to the folder.");
                     }
+                } else if (command.startsWith("execute ")) {
+                    // Execute command for specific file
+                    sendMessage(command);
+                    String response = receiveMessage();
+                    System.out.println("Server Response:\n" + response);
+                } else {
+                    System.out.println("Unknown command.");
+                }
+            }
+
 
         }
 
