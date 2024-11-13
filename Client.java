@@ -1,9 +1,13 @@
+import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.*;
 public class Client {
-    private Socket socket = null;
-    private DataInputStream input = null;
-    private DataOutputStream out = null;
+    private static final String SECRET_KEY_STRING = "YOUR_BASE64_SECRET_KEY";
+    private Socket clientSocket;
+    private BufferedReader in;
+    private PrintWriter out;
+    private BufferedReader userInput;
+    private SecretKey secretKey;
 
     public Client(String address, int port){
         try{
