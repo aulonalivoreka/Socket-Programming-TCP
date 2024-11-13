@@ -1,8 +1,10 @@
+import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.security.Key;
+import java.util.Base64;
 import java.util.Scanner;
 
 public class Client {
@@ -95,6 +97,12 @@ public class Client {
 
         byte[] key = "1234567890123456".getBytes(); // Simple 16-byte key for testing
         return new SecretKeySpec(key, "AES");
+    }
+    private static String encrypt(String message, Key key) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        byte[] encryptedBytes = cipher.doFinal(message.getBytes("UTF-8"));
+        return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
 }
