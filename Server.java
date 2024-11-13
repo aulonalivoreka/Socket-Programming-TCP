@@ -131,3 +131,38 @@ class ClientHandler implements Runnable {
             e.printStackTrace();
         }
     }    
+    // Send encrypted message to client
+private void sendMessage(String message) throws Exception {
+    String encryptedMessage = encrypt(message, aesKey);
+    output.writeUTF(encryptedMessage);
+}
+
+// Method to list files in the shared folder
+private void listFiles() throws Exception {
+    File folder = new File(folderPath);
+    File[] files = folder.listFiles();
+    StringBuilder fileList = new StringBuilder("Files:\n");
+    if (files != null) {
+        for (File file : files) {
+            fileList.append(file.getName()).append("\n");
+        }
+    }
+    sendMessage(fileList.toString());
+}
+
+// Method to read a file in the shared folder
+private void readFile(String filename) throws Exception {
+    File file = new File(folderPath + "/" + filename);
+    if (file.exists() && file.isFile()) {
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        StringBuilder fileContent = new StringBuilder("Content of " + filename + ":\n");
+        String line;
+        while ((line = reader.readLine()) != null) {
+            fileContent.append(line).append("\n");
+        }
+        reader.close();
+        sendMessage(fileContent.toString());
+    } else {
+        sendMessage("File not found: " + filename);
+    }
+}
