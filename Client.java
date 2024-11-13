@@ -45,31 +45,20 @@ public class Client {
     private void requestReadAccess() {
         sendEncryptedMessage("REQUEST_ACCESS");
     }
-        String line = "";
-        while (!line.equals("Over")) {
+     private void readServerResponses() {
+        new Thread(() -> {
+            String encryptedResponse;
             try {
-                line = input.readLine();
-                out.writeUTF(line);
+                while ((encryptedResponse = in.readLine()) != null) {
+                    String response = AESUtil.decrypt(encryptedResponse, secretKey);
+                    System.out.println("Server: " + response);
+                }
+            } catch (Exception e) {
+                System.out.println("Connection closed by server.");
             }
-            catch (IOException i) {
-                System.out.println(i);
-            }
-        }
-
-        try {
-            input.close();
-            out.close();
-            socket.close();
-        }
-        catch (IOException i) {
-            System.out.println(i);
-        }
+        }).start();
     }
-
-    public static void main(String args[])
-    {
-        Client client = new Client("127.0.0.1", 5000);
-    }
+       
 }
 
 
