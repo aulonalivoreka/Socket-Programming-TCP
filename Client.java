@@ -41,7 +41,27 @@ public class Client {
             String encryptedName = encrypt(clientName, aesKey);
             output.writeUTF(encryptedName);
 
+
+            // Main interaction loop with the server
+            while (true) {
+                System.out.print("Enter command (list_files, read_file [filename], write_file [filename], execute [filename], exit): ");
+                String command = scanner.nextLine();
+
+                if (command.equalsIgnoreCase("exit")) {
+                    sendMessage("exit");
+                    break;
+                } else if (command.equalsIgnoreCase("list_files")) {
+                    sendMessage("list_files");
+                    String response = receiveMessage();
+                    System.out.println("Server Response:\n" + response);
+                } else if (command.startsWith("read_file")) {
+                    sendMessage(command);
+                    String response = receiveMessage();
+                    System.out.println("Server Response:\n" + response);
+
         }
+
+
 
     }
 }
