@@ -104,6 +104,13 @@ public class Client {
         byte[] encryptedBytes = cipher.doFinal(message.getBytes("UTF-8"));
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
+    private static String decrypt(String encryptedMessage, Key key) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        byte[] decodedBytes = Base64.getDecoder().decode(encryptedMessage);
+        return new String(cipher.doFinal(decodedBytes), "UTF-8");
+    }
+
 
 }
 
