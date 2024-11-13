@@ -76,6 +76,62 @@ class ClientHandler implements Runnable {
     private boolean hasFullPermissions; // true if client has full access
     private String clientName;
 
+    
+    @Override
+    public void run() {
+        try {
+            input = new DataInputStream(clientSocket.getInputStream());
+            output = new DataOutputStream(clientSocket.getOutputStream());
+
+            // Inform client about their permissions
+            output.writeBoolean(hasFullPermissions);
+
+            // Receive client name
+            String encryptedName = input.readUTF();
+            clientName = decrypt(encryptedName, aesKey);
+            System.out.println(clientName + " connected from " + clientSocket.getRemoteSocketAddress());
+
+            // Process client requests
+            String encryptedMessage;
+            while ((encryptedMessage = input.readUTF()) != null) {
+                String message = decrypt(encryptedMessage, aesKey);
+                System.out.println(clientName + ": " + message);
+
+                if (message.equalsIgnoreCase("exit")) {
+                    System.out.println(clientName + " disconnected.");
+                    break;
+                } else if (message.equalsIgnoreCase("list_files")) {
+                    listFiles();
+                } else if (message.startsWith("read_file")) {
+                    readFile(message.substring(10));
+                } else if (message.startsWith("write_file")) {
+                    if (hasFullPermissions) {
+                        writeFile(message.substring(11));
+                    } else {
+                        sendMessage("Error: You do not have write permissions");
+                    }
+                } else if (message.startsWith("execute ")) {
+                    String filename = message.substring(8);
+                    if (hasFullPermissions) {
+                        executeFile(filename);
+                    } else {
+                        sendMessage("Error: You do not have execute permissions");
+                    }
+                } else {
+                    sendMessage("Unknown command");
+                }
+            }
+
+            // Close connections
+            input.close();
+            output.close();
+            clientSocket.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public ClientHandler(Socket socket, Key aesKey, String folderPath, boolean hasFullPermissions) {
         this.clientSocket = socket;
         this.aesKey = aesKey;
