@@ -1,82 +1,35 @@
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.*;
-import java.net.*;
-import java.util.Base64;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
+import java.security.Key;
+import java.util.Scanner;
 
 public class Client {
-    private static final String SECRET_KEY_STRING = "YOUR_BASE64_SECRET_KEY";
-    private Socket clientSocket;
-    private BufferedReader in;
-    private PrintWriter out;
-    private BufferedReader userInput;
-    private SecretKey secretKey;
-
-    public Client(String serverIp, int port, boolean fullAccess) {
+    private static Key aesKey;
+    private static boolean hasFullPermissions;
+    private static DataInputStream input;
+    private static DataOutputStream output;
+    private static String clientName;
+    public static void main(String[] args) {
         try {
-            byte[] decodedKey = Base64.getDecoder().decode(SECRET_KEY_STRING);
-            secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+            Scanner scanner = new Scanner(System.in);
 
-            clientSocket = new Socket(serverIp, port);
-            System.out.println("Connected to server at " + serverIp + ":" + port);
 
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            userInput = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Enter Server IP Address:");
+            String serverIp = scanner.nextLine();
+            System.out.println("Enter Server Port:");
+            int port = scanner.nextInt();
+            scanner.nextLine();
 
-            if (fullAccess) requestFullAccess();
-            else requestReadAccess();
 
-            readServerResponses();
+            Socket socket = new Socket(serverIp, port);
+            System.out.println("Connected to server.");
 
-        } catch (IOException e) {
-            e.printStackTrace();
+      
+            input = new DataInputStream(socket.getInputStream());
+            output = new DataOutputStream(socket.getOutputStream());
+
         }
-    }
-    private void requestFullAccess() {
-        System.out.print("Enter full access key: ");
-        try {
-            String accessKey = userInput.readLine();
-            sendEncryptedMessage("FULL_ACCESS " + accessKey);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    private void requestReadAccess() {
-        sendEncryptedMessage("REQUEST_ACCESS");
-    }
-     private void readServerResponses() {
-        new Thread(() -> {
-            String encryptedResponse;
-            try {
-                while ((encryptedResponse = in.readLine()) != null) {
-                    String response = AESUtil.decrypt(encryptedResponse, secretKey);
-                    System.out.println("Server: " + response);
-                }
-            } catch (Exception e) {
-                System.out.println("Connection closed by server.");
-            }
-        }).start();
-    }
 
-     public void sendMessage() {
-        System.out.print("Enter message: ");
-        try {
-            String message = userInput.readLine();
-            sendEncryptedMessage(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
-     private void sendEncryptedMessage(String message) {
-        try {
-            out.println(AESUtil.encrypt(message, secretKey));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-       
 }
-
-
-
