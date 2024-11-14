@@ -62,7 +62,6 @@ public class Server {
         byte[] key = "1234567890123456".getBytes(); // Simple 16-byte key
         return new SecretKeySpec(key, "AES");
     }
-
 }
 
 class ClientHandler implements Runnable {
@@ -199,7 +198,6 @@ class ClientHandler implements Runnable {
     private void executeFile(String filename) throws Exception {
         File file = new File(folderPath + "/" + filename);
         if (file.exists() && file.canExecute()) {
-            // Choose the command based on file type
             String[] command;
             if (filename.endsWith(".sh")) {
                 command = new String[] { "bash", file.getAbsolutePath() };
@@ -216,7 +214,6 @@ class ClientHandler implements Runnable {
                 return;
             }
 
-            // Execute the file
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             Process process = processBuilder.start();
 
