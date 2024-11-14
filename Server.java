@@ -109,16 +109,16 @@ class ClientHandler implements Runnable {
                     listFiles();
                 } else if (message.startsWith("read_file")) {
                     readFile(message.substring(10));
-                } else if (message.startsWith("write_file")) {
+                } else if (message.startsWith("write_file ")) { // Check with a space to ensure format is correct
                     if (hasFullPermissions) {
-                        writeFile(message.substring(11));
+                        writeFile(message.substring(11).trim()); // Trim any extra whitespace
                     } else {
                         // Log unauthorized attempt on the server console
                         System.out.println("Unauthorized attempt by " + clientName + " to write to a file.");
                         sendMessage("Error: You do not have write permissions");
                     }
                 } else if (message.startsWith("execute ")) {
-                    String filename = message.substring(8);
+                    String filename = message.substring(8).trim();
                     if (hasFullPermissions) {
                         executeFile(filename);
                     } else {
