@@ -76,7 +76,14 @@ class ClientHandler implements Runnable {
     private boolean hasFullPermissions; // true if client has full access
     private String clientName;
 
-    
+    public ClientHandler(Socket clientSocket, Key aesKey, String folderPath, boolean hasFullPermissions) {
+        this.clientSocket = clientSocket;
+        this.aesKey = aesKey;
+        this.folderPath = folderPath;
+        this.hasFullPermissions = hasFullPermissions;
+    }
+
+
     @Override
     public void run() {
         try {
