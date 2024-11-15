@@ -13,6 +13,7 @@ public class Client {
     private static DataInputStream input;
     private static DataOutputStream output;
     private static String clientName;
+
     public static void main(String[] args) {
         try {
             Scanner scanner = new Scanner(System.in);
@@ -44,28 +45,27 @@ public class Client {
             clientName = scanner.nextLine();
             String encryptedName = encrypt(clientName, aesKey);
             output.writeUTF(encryptedName);
-
+            System.out.println("Client name sent to server.");
 
             // Main interaction loop with the server
             while (true) {
                 System.out.print("Enter command (list_files, read_file [filename], write_file [filename], execute [filename], exit): ");
                 String command = scanner.nextLine();
+                sendMessage(command); // Notify server of the command
 
                 if (command.equalsIgnoreCase("exit")) {
-                    sendMessage("exit");
+                    System.out.println("Exiting and notifying server.");
                     break;
                 } else if (command.equalsIgnoreCase("list_files")) {
-                    sendMessage("list_files");
                     String response = receiveMessage();
                     System.out.println("Server Response:\n" + response);
                 } else if (command.startsWith("read_file")) {
-                    sendMessage(command);
                     String response = receiveMessage();
                     System.out.println("Server Response:\n" + response);
                 } else if (command.startsWith("write_file")) {
                     if (hasFullPermissions) {
-                        sendMessage(command);
-                        // Wait for server to prompt for content
+                        // Notify server of write command
+                        System.out.println("Notifying server of write_file command.");
                         String prompt = receiveMessage();
                         System.out.println(prompt);
                         String content = scanner.nextLine();
@@ -76,8 +76,8 @@ public class Client {
                         System.out.println("Error: You do not have permission to write to the folder.");
                     }
                 } else if (command.startsWith("execute ")) {
-                    // Execute command for specific file
-                    sendMessage(command);
+                    // Notify server of execute command
+                    System.out.println("Notifying server of execute command.");
                     String response = receiveMessage();
                     System.out.println("Server Response:\n" + response);
                 } else {
@@ -95,12 +95,14 @@ public class Client {
             e.printStackTrace();
         }
     }
+
     // Generate AES key for encryption
     private static Key generateAESKey() {
         // The key should match the server's key. For simplicity, we use a fixed key here.
         byte[] key = "1234567890123456".getBytes(); // Simple 16-byte key for testing
         return new SecretKeySpec(key, "AES");
     }
+
     // Encrypt a message using AES
     private static String encrypt(String message, Key key) throws Exception {
         Cipher cipher = Cipher.getInstance("AES");
@@ -108,6 +110,7 @@ public class Client {
         byte[] encryptedBytes = cipher.doFinal(message.getBytes("UTF-8"));
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
+
     // Decrypt a message using AES
     private static String decrypt(String encryptedMessage, Key key) throws Exception {
         Cipher cipher = Cipher.getInstance("AES");
@@ -115,19 +118,16 @@ public class Client {
         byte[] decodedBytes = Base64.getDecoder().decode(encryptedMessage);
         return new String(cipher.doFinal(decodedBytes), "UTF-8");
     }
+
     // Send encrypted message to the server
     private static void sendMessage(String message) throws Exception {
         String encryptedMessage = encrypt(message, aesKey);
         output.writeUTF(encryptedMessage);
     }
+
     // Receive and decrypt message from the server
     private static String receiveMessage() throws Exception {
         String encryptedMessage = input.readUTF();
         return decrypt(encryptedMessage, aesKey);
     }
 }
-
-
-
-
-

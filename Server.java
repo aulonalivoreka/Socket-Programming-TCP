@@ -65,7 +65,6 @@ public class Server {
 }
 
 class ClientHandler implements Runnable {
-
     private Socket clientSocket;
     private Key aesKey;
     private String folderPath;
@@ -108,12 +107,12 @@ class ClientHandler implements Runnable {
                     listFiles();
                 } else if (message.startsWith("read_file")) {
                     readFile(message.substring(10));
-                } else if (message.startsWith("write_file ")) { // Check with a space to ensure format is correct
+                } else if (message.startsWith("write_file ")) {
                     if (hasFullPermissions) {
-                        writeFile(message.substring(11).trim()); // Trim any extra whitespace
+                        writeFile(message.substring(11).trim());
                     } else {
-                        // Log unauthorized attempt on the server console
-                        System.out.println("Unauthorized attempt by " + clientName + " to write to a file.");
+                        // Notify the server about the restricted command
+                        System.out.println("Unauthorized write attempt by " + clientName);
                         sendMessage("Error: You do not have write permissions");
                     }
                 } else if (message.startsWith("execute ")) {
@@ -121,11 +120,13 @@ class ClientHandler implements Runnable {
                     if (hasFullPermissions) {
                         executeFile(filename);
                     } else {
-                        // Log unauthorized attempt on the server console
-                        System.out.println("Unauthorized attempt by " + clientName + " to execute a file.");
+                        // Notify the server about the restricted command
+                        System.out.println("Unauthorized execute attempt by " + clientName);
                         sendMessage("Error: You do not have execute permissions");
                     }
                 } else {
+                    // Log any unknown command attempts
+                    System.out.println("Unknown command attempt by " + clientName + ": " + message);
                     sendMessage("Unknown command");
                 }
             }
@@ -134,7 +135,6 @@ class ClientHandler implements Runnable {
             input.close();
             output.close();
             clientSocket.close();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -183,7 +183,6 @@ class ClientHandler implements Runnable {
             sendMessage("Enter content to write to " + filename + ":");
             String encryptedContent = input.readUTF();
             String content = decrypt(encryptedContent, aesKey);
-
             BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
             writer.write(content);
             writer.newLine();
@@ -213,10 +212,8 @@ class ClientHandler implements Runnable {
                 sendMessage("Unsupported file type for execution: " + filename);
                 return;
             }
-
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             Process process = processBuilder.start();
-
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             StringBuilder output = new StringBuilder("Execution result of " + filename + ":\n");
             String line;
@@ -225,7 +222,6 @@ class ClientHandler implements Runnable {
             }
             reader.close();
             sendMessage(output.toString());
-
         } else {
             sendMessage("File is not executable or does not exist: " + filename);
         }
@@ -247,3 +243,4 @@ class ClientHandler implements Runnable {
         return new String(cipher.doFinal(decodedBytes), "UTF-8");
     }
 }
+
