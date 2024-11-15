@@ -33,7 +33,7 @@ public class Client {
             input = new DataInputStream(socket.getInputStream());
             output = new DataOutputStream(socket.getOutputStream());
 
-            // Generate AES key for encryption (should be same as server's key)
+            // Generate AES key for encryption (should match the server's key)
             aesKey = generateAESKey();
 
             // Receive permissions from the server
@@ -49,7 +49,7 @@ public class Client {
 
             // Main interaction loop with the server
             while (true) {
-                System.out.print("Enter command (list_files, read_file [filename], write_file [filename], execute [filename], exit): ");
+                System.out.print("Enter command (list_files, read_file [filename], write_file [filename], execute [filename], delete_file [filename], exit): ");
                 String command = scanner.nextLine();
                 sendMessage(command); // Notify server of the command
 
@@ -62,9 +62,8 @@ public class Client {
                 } else if (command.startsWith("read_file")) {
                     String response = receiveMessage();
                     System.out.println("Server Response:\n" + response);
-                } else if (command.startsWith("write_file")) {
+                } else if (command.startsWith("write_file ")) {
                     if (hasFullPermissions) {
-                        // Notify server of write command
                         System.out.println("Notifying server of write_file command.");
                         String prompt = receiveMessage();
                         System.out.println(prompt);
@@ -76,10 +75,21 @@ public class Client {
                         System.out.println("Error: You do not have permission to write to the folder.");
                     }
                 } else if (command.startsWith("execute ")) {
-                    // Notify server of execute command
-                    System.out.println("Notifying server of execute command.");
-                    String response = receiveMessage();
-                    System.out.println("Server Response:\n" + response);
+                    if (hasFullPermissions) {
+                        System.out.println("Notifying server of execute command.");
+                        String response = receiveMessage();
+                        System.out.println("Server Response:\n" + response);
+                    } else {
+                        System.out.println("Error: You do not have permission to execute files.");
+                    }
+                } else if (command.startsWith("delete_file ")) {
+                    if (hasFullPermissions) {
+                        System.out.println("Notifying server of delete_file command.");
+                        String response = receiveMessage();
+                        System.out.println("Server Response:\n" + response);
+                    } else {
+                        System.out.println("Error: You do not have permission to delete files.");
+                    }
                 } else {
                     System.out.println("Unknown command.");
                 }

@@ -11,28 +11,24 @@ public class Server {
 
     private static List<ClientHandler> connections = new ArrayList<>();
     private static ExecutorService pool = Executors.newCachedThreadPool();
-    private static Key aesKey; // Encryption key
-    private static final String folderPath = "shared_folder"; // Folder for client access
-    private static String fullPermissionIpAddress; // IP Address with full permissions
+    private static Key aesKey;
+    private static final String folderPath = "shared_folder";
+    private static String fullPermissionIpAddress;
 
     public static void main(String[] args) {
         try {
-            // Set variables: IP address and port number
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter IP Address:");
             String ipAddress = scanner.nextLine();
             System.out.println("Enter Port Number:");
             int port = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
 
-            // Prompt to choose IP address for full permissions
             System.out.println("Enter the IP address of the client that will have full permissions:");
             fullPermissionIpAddress = scanner.nextLine();
 
-            // Generate AES encryption key
             aesKey = generateAESKey();
 
-            // Create the server socket
             ServerSocket serverSocket = new ServerSocket(port, 50, InetAddress.getByName(ipAddress));
             System.out.println("Server started on IP " + ipAddress + " and port " + port);
 
@@ -56,10 +52,8 @@ public class Server {
         }
     }
 
-    // Generate AES key for encryption
     private static Key generateAESKey() {
-        // Fixed 16-byte (128-bit) key for testing purposes
-        byte[] key = "1234567890123456".getBytes(); // Simple 16-byte key
+        byte[] key = "1234567890123456".getBytes();
         return new SecretKeySpec(key, "AES");
     }
 }
@@ -70,7 +64,7 @@ class ClientHandler implements Runnable {
     private String folderPath;
     private DataInputStream input;
     private DataOutputStream output;
-    private boolean hasFullPermissions; // true if client has full access
+    private boolean hasFullPermissions;
     private String clientName;
 
     public ClientHandler(Socket socket, Key aesKey, String folderPath, boolean hasFullPermissions) {
@@ -111,7 +105,6 @@ class ClientHandler implements Runnable {
                     if (hasFullPermissions) {
                         writeFile(message.substring(11).trim());
                     } else {
-                        // Notify the server about the restricted command
                         System.out.println("Unauthorized write attempt by " + clientName);
                         sendMessage("Error: You do not have write permissions");
                     }
@@ -120,18 +113,23 @@ class ClientHandler implements Runnable {
                     if (hasFullPermissions) {
                         executeFile(filename);
                     } else {
-                        // Notify the server about the restricted command
                         System.out.println("Unauthorized execute attempt by " + clientName);
                         sendMessage("Error: You do not have execute permissions");
                     }
+                } else if (message.startsWith("delete_file ")) {
+                    String filename = message.substring(12).trim();
+                    if (hasFullPermissions) {
+                        deleteFile(filename);
+                    } else {
+                        System.out.println("Unauthorized delete attempt by " + clientName + " for file: " + filename);
+                        sendMessage("Error: You do not have delete permissions");
+                    }
                 } else {
-                    // Log any unknown command attempts
                     System.out.println("Unknown command attempt by " + clientName + ": " + message);
                     sendMessage("Unknown command");
                 }
             }
 
-            // Close connections
             input.close();
             output.close();
             clientSocket.close();
@@ -140,7 +138,6 @@ class ClientHandler implements Runnable {
         }
     }
 
-    // Send encrypted message to client
     private void sendMessage(String message) throws Exception {
         String encryptedMessage = encrypt(message, aesKey);
         output.writeUTF(encryptedMessage);
@@ -224,6 +221,21 @@ class ClientHandler implements Runnable {
             sendMessage(output.toString());
         } else {
             sendMessage("File is not executable or does not exist: " + filename);
+        }
+    }
+
+    // Method to delete a file in the shared folder (only for clients with full permissions)
+    private void deleteFile(String filename) throws Exception {
+        File file = new File(folderPath + "/" + filename);
+        if (file.exists() && file.isFile()) {
+            if (file.delete()) {
+                sendMessage("File " + filename + " deleted successfully.");
+                System.out.println(clientName + " deleted file: " + filename);
+            } else {
+                sendMessage("Error: Could not delete the file: " + filename);
+            }
+        } else {
+            sendMessage("File not found: " + filename);
         }
     }
 
