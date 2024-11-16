@@ -16,7 +16,7 @@ The Programming with Sockets project is a TCP-based client-server application wr
 - [Running the Client](#running-the-client)
 - [Authors](#authors)
   
-<br>.
+
 ## Components
 The system includes two main components:
 
