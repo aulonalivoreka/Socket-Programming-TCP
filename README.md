@@ -29,7 +29,6 @@ The system includes two main components:
   - Sends commands to the server for file management operations.
 
     
-<br>.
 ## Detailed Component Description
 
 ### Server
@@ -68,7 +67,6 @@ The client is responsible for:
     - List of available files (in case of the LIST command).
     - Error messages (e.g., if a file does not exist, if a command is invalid, or if access is restricted).
 
-<br>.
 ## Prerequisites
 Before running the application, ensure that you have the following software:
  - [Java Development Kit (JDK) 8 or higher](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html)
