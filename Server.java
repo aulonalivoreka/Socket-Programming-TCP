@@ -32,13 +32,11 @@ public class Server {
             ServerSocket serverSocket = new ServerSocket(port, 50, InetAddress.getByName(ipAddress));
             System.out.println("Server started on IP " + ipAddress + " and port " + port);
 
-            // Ensure the shared folder exists
             File folder = new File(folderPath);
             if (!folder.exists()) {
                 folder.mkdir();
             }
 
-            // Listen for connections
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Client connected: " + clientSocket.getRemoteSocketAddress());
@@ -80,15 +78,12 @@ class ClientHandler implements Runnable {
             input = new DataInputStream(clientSocket.getInputStream());
             output = new DataOutputStream(clientSocket.getOutputStream());
 
-            // Inform client about their permissions
             output.writeBoolean(hasFullPermissions);
 
-            // Receive client name
             String encryptedName = input.readUTF();
             clientName = decrypt(encryptedName, aesKey);
             System.out.println(clientName + " connected from " + clientSocket.getRemoteSocketAddress());
 
-            // Process client requests
             String encryptedMessage;
             while ((encryptedMessage = input.readUTF()) != null) {
                 String message = decrypt(encryptedMessage, aesKey);
@@ -143,7 +138,6 @@ class ClientHandler implements Runnable {
         output.writeUTF(encryptedMessage);
     }
 
-    // Method to list files in the shared folder
     private void listFiles() throws Exception {
         File folder = new File(folderPath);
         File[] files = folder.listFiles();
@@ -156,7 +150,6 @@ class ClientHandler implements Runnable {
         sendMessage(fileList.toString());
     }
 
-    // Method to read a file in the shared folder
     private void readFile(String filename) throws Exception {
         File file = new File(folderPath + "/" + filename);
         if (file.exists() && file.isFile()) {
@@ -173,7 +166,6 @@ class ClientHandler implements Runnable {
         }
     }
 
-    // Method to write to a file in the shared folder (only for clients with full permissions)
     private void writeFile(String filename) throws Exception {
         File file = new File(folderPath + "/" + filename);
         if (file.exists() && file.isFile()) {
@@ -190,7 +182,6 @@ class ClientHandler implements Runnable {
         }
     }
 
-    // Method to execute a file in the shared folder (only for clients with full permissions)
     private void executeFile(String filename) throws Exception {
         File file = new File(folderPath + "/" + filename);
         if (file.exists() && file.canExecute()) {
@@ -224,7 +215,6 @@ class ClientHandler implements Runnable {
         }
     }
 
-    // Method to delete a file in the shared folder (only for clients with full permissions)
     private void deleteFile(String filename) throws Exception {
         File file = new File(folderPath + "/" + filename);
         if (file.exists() && file.isFile()) {
@@ -239,7 +229,6 @@ class ClientHandler implements Runnable {
         }
     }
 
-    // Encryption method
     private String encrypt(String message, Key key) throws Exception {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -247,7 +236,6 @@ class ClientHandler implements Runnable {
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
-    // Decryption method
     private String decrypt(String encryptedMessage, Key key) throws Exception {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.DECRYPT_MODE, key);
